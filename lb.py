@@ -1,10 +1,9 @@
 #!/usr/bin/python3
 
-import aoc
-
 from datetime import datetime
 from pytz import timezone
-import sys
+from time import time
+import pathlib, sys, re, requests, os, json
 
 class Member:
     def __init__(self, member):
@@ -28,11 +27,14 @@ class Member:
         return(_stars)
 
 class LeaderBoard:
-    def __init__(self, lb_id):
-        json_lb = aoc.load_leaderboard(lb_id)
+    def __init__(self, lb_id, year=datetime.now().year, cache_dir="leaderboards"):
         self._id = lb_id
+        self._year = year
+        self._cache_filename = "%s/%s.json" % (cache_dir, str(lb_id))
+        json_lb = self._load()
         self._members = [ Member(json_lb['members'][id]) for id in json_lb['members'] ]
         self._events = {}
+
         for m, stars in [ [ m, m.stars() ] for m in self._members ]:
             m._progress_score = 0
             for s in stars:
@@ -65,6 +67,34 @@ class LeaderBoard:
 
                 star_rewards[e['day']][e['star']]['points'] = max(star_rewards[e['day']][e['star']]['points']-1, 0)
                 star_rewards[e['day']][e['star']]['rank'] += 1
+
+    def _load(self):
+        cache_file = pathlib.Path(self._cache_filename)
+        if cache_file.exists():
+            if time() - cache_file.stat().st_mtime <= 60*15:
+                print("Using leaderboard cache %s" % self._cache_filename)
+                with open(self._cache_filename) as f:
+                    return(json.loads(f.read()))
+
+        lb_url = "https://adventofcode.com/%d/leaderboard/private/view/%d.json" % (int(self._year), int(self._id))
+        try:
+            session_id = os.environ['AOC_SESSION_ID']
+        except KeyError:
+            print("AOC_SESSION_ID environment variable is not defined")
+            sys.exit(1)
+
+        print("Fetching leaderboard #%d from %s" % (self._id, lb_url))
+        with requests.get(lb_url, cookies={"session": session_id}) as r:
+            if r.status_code == 302:
+                print("Got a 302 : leaderboard not found or bad session_id ?")
+                sys.exit(1)
+            r.raise_for_status()
+            try:
+                with open(self._cache_filename, 'w') as f:
+                    f.write(r.text)
+            except:
+                print("Failed to create %s" % self._cache_filename)
+            return(json.loads(r.text))
 
     def dump(self):
         for m in self._members:

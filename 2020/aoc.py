@@ -39,7 +39,7 @@ def read_puzzle_input(year=datetime.datetime.now().year):
         yield(args.string)
     else:
         if args.input_file is None:
-            m = re.search('^.*\/day(\d{2})', sys.argv[0])
+            m = re.search(r'^.*\/day(\d{2})', sys.argv[0])
             if not m:
                 print("Could not identify day from %s" % sys.argv[0])
                 sys.exit(1)
@@ -51,42 +51,3 @@ def read_puzzle_input(year=datetime.datetime.now().year):
 
 def load_puzzle_input(year=datetime.datetime.now().year):
     return([ line for line in read_puzzle_input(year) ])
-
-def fetch_leaderboard(year, lb_id, reload=False):
-    lb_filename_pattern = "leaderboards/%d_*.json" % int(lb_id)
-    try:
-        last_lb_filename = sorted(glob.glob(lb_filename_pattern))[-1]
-        m = re.search(r'.*_(\d+)\.json$', last_lb_filename)
-        last_lb_ts = int(m.group(1))
-    except IndexError:
-        last_lb_filename = None
-        last_lb_ts = None
-
-    if last_lb_ts is not None and time.time() - last_lb_ts <= 60*60:
-        return(last_lb_filename)
-
-    lb_url = "https://adventofcode.com/%d/leaderboard/private/view/%d.json" % (int(year), int(lb_id))
-    lb_filename = "leaderboards/%d_%d.json" % (int(lb_id), time.time())
-    try:
-        session_id = os.environ['AOC_SESSION_ID']
-    except KeyError:
-        print("AOC_SESSION_ID environment variable is not defined")
-        sys.exit(1)
-
-    print("Saving leaderboard %s in %s" % (lb_url, lb_filename))
-    with requests.get(lb_url, cookies={"session": session_id}, stream=True) as r:
-        if r.status_code == 302:
-            print("Got a 302 : leaderboard not found or bad session_id ?")
-            sys.exit(1)
-        r.raise_for_status()
-        r.raw.decode_content = True
-        with open(lb_filename, 'wb') as f:
-            shutil.copyfileobj(r.raw, f)
-    return(lb_filename)
-
-def load_leaderboard(lb_id, year=datetime.datetime.now().year):
-    lb_filename = fetch_leaderboard(year, lb_id)
-
-    with open(lb_filename) as f:
-        return(json.loads(f.read()))
-

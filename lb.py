@@ -3,6 +3,7 @@
 from datetime import datetime
 from pytz import timezone
 from time import time
+
 import pathlib, sys, re, requests, os, json
 
 class Member:
@@ -12,18 +13,21 @@ class Member:
         self._score = member['local_score']
         self._stars = {}
         for d in member['completion_day_level']:
-            self._stars[d] = {}
+            self._stars[int(d)] = {}
             for s in member['completion_day_level'][d]:
-                self._stars[d][s] = int(member['completion_day_level'][d][s]['get_star_ts'])
+                self._stars[int(d)][int(s)] = { "ts": int(member['completion_day_level'][d][s]['get_star_ts']) }
     
-    def __repr__(self):
+    def __str__(self):
         desc = self._name if self._name is not None else "User #%d" % self._id
         return(desc)
     
+    def __repr__(self):
+        return(self._id)
+    
     def stars(self):
         _stars = []
-        for ts, day, star in [ [ self._stars[d][s], int(d), int(s) ] for d in self._stars for s in self._stars[d] ]:
-            _stars.append({ "ts": ts, "day": day, "star": star })
+        for day, star in [ [ int(d), int(s) ] for d in self._stars for s in self._stars[d] ]:
+            _stars.append({ "ts": self._stars[day][star]['ts'], "day": day, "star": star })
         return(_stars)
 
 class LeaderBoard:
@@ -33,17 +37,15 @@ class LeaderBoard:
         self._cache_filename = "%s/%s.json" % (cache_dir, str(lb_id))
         json_lb = self._load()
         self._members = [ Member(json_lb['members'][id]) for id in json_lb['members'] ]
-        self._events = {}
+        self._events = []
 
-        for m, stars in [ [ m, m.stars() ] for m in self._members ]:
+        for m in self._members:
             m._progress_score = 0
-            for s in stars:
-                this_event = { "member": m, "day": s['day'], "star": s['star'] }
-                if s['ts'] in self._events:
-                    self._events[s['ts']].append(this_event)
-                else:
-                    self._events[s['ts']] = [ this_event ]
-        
+            for s in m.stars():
+                self._events.append({ "ts": s['ts'], "member": m, "day": s['day'], "star": s['star'] })
+
+        self._events = sorted(self._events, key=lambda e: e['ts'])
+
         # Initialize star rewards per day (day #1 is an exception: no reward)
         star_rewards = { 1: {
             1: { "points": 0, "rank": 1 },
@@ -56,17 +58,20 @@ class LeaderBoard:
                 2: { "points": len(self._members), "rank": 1 }
             }
 
-        for ts in sorted(self._events):
-            for e in self._events[ts]:
-                e['points'] = star_rewards[e['day']][e['star']]['points']
-                e['rank'] = star_rewards[e['day']][e['star']]['rank']
+        for e in self._events:
+            e['points'] = star_rewards[e['day']][e['star']]['points']
+            e['rank'] = star_rewards[e['day']][e['star']]['rank']
 
-                e['member']._progress_score += e['points']
-                e['score'] = e['member']._progress_score
-                e['global_rank'] = 1+len([ m for m in self._members if m._progress_score > e['member']._progress_score ])
+            e['member']._progress_score += e['points']
+            e['score'] = e['member']._progress_score
+            e['global_rank'] = 1+len([ m for m in self._members if m._progress_score > e['member']._progress_score ])
 
-                star_rewards[e['day']][e['star']]['points'] = max(star_rewards[e['day']][e['star']]['points']-1, 0)
-                star_rewards[e['day']][e['star']]['rank'] += 1
+            e['member']._stars[e['day']][e['star']]['points'] = e['points']
+            e['member']._stars[e['day']][e['star']]['rank'] = e['rank']
+            e['member']._stars[e['day']][e['star']]['global_rank'] = e['global_rank']
+
+            star_rewards[e['day']][e['star']]['points'] = max(star_rewards[e['day']][e['star']]['points']-1, 0)
+            star_rewards[e['day']][e['star']]['rank'] += 1
 
     def _load(self):
         cache_file = pathlib.Path(self._cache_filename)
@@ -96,29 +101,70 @@ class LeaderBoard:
                 print("Failed to create %s" % self._cache_filename)
             return(json.loads(r.text))
 
-    def dump(self):
-        for m in self._members:
-            print(m)
-        print(self._events)
+    def dump_ranking(self, day=None):
+        first_day = 1
+        last_day = 25
+        if day is not None:
+            m = re.search(r'^(\d+)[:-](\d+)$', day)
+            if m is not None:
+                first_day = int(m.group(1))
+                last_day = int(m.group(2))
+            else:
+                last_day = int(day)
+        ranking = {}
+        for e in [ e for e in self._events if e['day'] in range(first_day, last_day+1) ]:
+            if e['member'] in ranking:
+                ranking[e['member']]['points'] += e['points']
+                ranking[e['member']]['rank'] = e['rank']
+                ranking[e['member']]['stars'] += 1
+            else:
+                ranking[e['member']] = { 'points': e['points'], 'rank': e['rank'], 'stars': 1 }
+
+        for rank,m in enumerate(sorted(ranking, key=lambda m: ranking[m]['points'], reverse=True)):
+            print("%2d %-30s %2d stars / %3d pts" % (rank+1, m, ranking[m]['stars'], ranking[m]['points']))
+
+    def dump_events(self, user=None, localtime=False):
+        last_ts = None
+        last_day = None
+        tz = timezone('CET' if localtime else 'EST')
+        for e in [ e for e in self._events if user is None or str(e['member']).lower().find(user)>=0 ]:
+            this_day = datetime.fromtimestamp(e['ts'], tz=timezone('EST')).strftime("%d")
+            if last_day is not None and this_day != last_day:
+                print("_" * 100)
+            last_day = this_day
+            this_ts = datetime.fromtimestamp(e['ts'], tz=tz).strftime("%d %H:%M:%S")
+            if last_ts is not None and this_ts == last_ts:
+                this_ts = ""
+            else:
+                last_ts = this_ts
+
+            print("%-14s %-30s #%2d %4d pts | +%2d pts for being #%2d on star %2d/%d" % (
+                this_ts,
+                e['member'],
+                e['global_rank'],
+                e['score'],
+                e['points'],
+                e['rank'],
+                e['day'],
+                e['star']
+                )
+            )
+
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--id", type=int, default=563747)
+parser.add_argument("--day", "-d")
+parser.add_argument("--events", "-e", action='store_true')
+parser.add_argument("--localtime", "-l", action='store_true')
+parser.add_argument("--user", "-u")
+
+args = parser.parse_args()
 
 #lb = LeaderBoard(978694)
-lb = LeaderBoard(563747)
-for m in lb._members:
-    print(m)
+lb = LeaderBoard(args.id)
 
-for ts in sorted(lb._events):
-    for e in lb._events[ts]:
-        print("%-14s %-30s #%2d %4d pts | Day %2d, star %d (#%2d: +%2d pts) " % (
-            datetime.fromtimestamp(ts, tz=timezone('EST')).strftime("%d %H:%M:%S"),
-            e['member'],
-            e['global_rank'],
-            e['score'],
-            e['day'],
-            e['star'],
-            e['rank'],
-            e['points']
-            )
-        )
+if args.events:
+    lb.dump_events(user=args.user, localtime = args.localtime)
+else:
+    lb.dump_ranking(args.day)
 
-for m in [ m for m in lb._members if m._score != m._progress_score ]:
-    print("Score mismatch for %s: ends with %d instead of %d" % (m, m._progress_score, m._score))

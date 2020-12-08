@@ -96,13 +96,19 @@ class LeaderBoard:
                 print("Failed to create %s" % self._cache_filename)
             return(json.loads(r.text))
 
-    def dump(self):
-        for m in self._members:
-            print(m)
-        print(self._events)
+    def dump(self, day):
+        board = []
+        for ts in sorted(self._events):
+            for e in [ e for e in lb._events[ts] if lb._events[e]['day'] == day ][-1]:
+                board.append([ e['member'], e['star'], e['global_rank'], e['score'] ])
+
+        for l in sorted(board, key=lambda l: l['score']):
+            print("%02d %-30s %d stars / %3 pts" % (l['global_rank'], l['member'], l['star'], l['score']))
 
 #lb = LeaderBoard(978694)
 lb = LeaderBoard(563747)
+lb.dump(8)
+exit(0)
 for m in lb._members:
     print(m)
 

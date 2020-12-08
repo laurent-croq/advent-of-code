@@ -12,18 +12,21 @@ class Member:
         self._score = member['local_score']
         self._stars = {}
         for d in member['completion_day_level']:
-            self._stars[d] = {}
+            self._stars[int(d)] = {}
             for s in member['completion_day_level'][d]:
-                self._stars[d][s] = int(member['completion_day_level'][d][s]['get_star_ts'])
+                self._stars[int(d)][int(s)] = { "ts": int(member['completion_day_level'][d][s]['get_star_ts']) }
     
-    def __repr__(self):
+    def __str__(self):
         desc = self._name if self._name is not None else "User #%d" % self._id
         return(desc)
     
+    def __repr__(self):
+        return(self._id)
+    
     def stars(self):
         _stars = []
-        for ts, day, star in [ [ self._stars[d][s], int(d), int(s) ] for d in self._stars for s in self._stars[d] ]:
-            _stars.append({ "ts": ts, "day": day, "star": star })
+        for day, star in [ [ int(d), int(s) ] for d in self._stars for s in self._stars[d] ]:
+            _stars.append({ "ts": self._stars[day][star]['ts'], "day": day, "star": star })
         return(_stars)
 
 class LeaderBoard:
@@ -65,6 +68,10 @@ class LeaderBoard:
                 e['score'] = e['member']._progress_score
                 e['global_rank'] = 1+len([ m for m in self._members if m._progress_score > e['member']._progress_score ])
 
+                e['member']._stars[e['day']][e['star']]['points'] = e['points']
+                e['member']._stars[e['day']][e['star']]['rank'] = e['rank']
+                e['member']._stars[e['day']][e['star']]['global_rank'] = e['global_rank']
+
                 star_rewards[e['day']][e['star']]['points'] = max(star_rewards[e['day']][e['star']]['points']-1, 0)
                 star_rewards[e['day']][e['star']]['rank'] += 1
 
@@ -96,21 +103,31 @@ class LeaderBoard:
                 print("Failed to create %s" % self._cache_filename)
             return(json.loads(r.text))
 
-    def dump(self, day):
-        board = []
+    def dump(self, day_up_to=25, day_from=1):
+        board = {}
         for ts in sorted(self._events):
-            for e in [ e for e in lb._events[ts] if lb._events[e]['day'] == day ][-1]:
-                board.append([ e['member'], e['star'], e['global_rank'], e['score'] ])
+            #for e in [ e for e in lb._events[ts] if lb._events[ts][e]['day'] == day ][-1:]:
+            for e in lb._events[ts]:
+                if e['day'] in range(day_from, day_up_to+1):
+                    if e['member']._id in board:
+                        board[e['member']._id]['points'] += e['points']
+                        board[e['member']._id]['rank'] = e['rank']
+                        board[e['member']._id]['stars'] += 1
+                    else:
+                        board[e['member']._id] = { 'points': e['points'], 'rank': e['rank'], 'stars': 1 }
 
-        for l in sorted(board, key=lambda l: l['score']):
-            print("%02d %-30s %d stars / %3 pts" % (l['global_rank'], l['member'], l['star'], l['score']))
+        for rank,i in enumerate(sorted(board, key=lambda i: board[i]['points'], reverse=True)):
+            print("%02d %-30s %d stars / %3d pts" % (rank+1, i, board[i]['stars'], board[i]['points']))
 
 #lb = LeaderBoard(978694)
 lb = LeaderBoard(563747)
-lb.dump(8)
+
+lb.dump(5,1)
 exit(0)
+
 for m in lb._members:
     print(m)
+exit(0)
 
 for ts in sorted(lb._events):
     for e in lb._events[ts]:

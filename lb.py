@@ -31,11 +31,11 @@ class Member:
         return(_stars)
 
 class LeaderBoard:
-    def __init__(self, lb_id, year=datetime.now().year, cache_dir="leaderboards"):
+    def __init__(self, lb_id, year=datetime.now().year, cache_dir="leaderboards", reload=False):
         self._id = lb_id
         self._year = year
         self._cache_filename = "%s/%s.json" % (cache_dir, str(lb_id))
-        json_lb = self._load()
+        json_lb = self._load(reload=reload)
         self._members = [ Member(json_lb['members'][id]) for id in json_lb['members'] ]
         self._events = []
 
@@ -73,9 +73,9 @@ class LeaderBoard:
             star_rewards[e['day']][e['star']]['points'] = max(star_rewards[e['day']][e['star']]['points']-1, 0)
             star_rewards[e['day']][e['star']]['rank'] += 1
 
-    def _load(self):
+    def _load(self, reload=False):
         cache_file = pathlib.Path(self._cache_filename)
-        if cache_file.exists():
+        if cache_file.exists() and not reload:
             if time() - cache_file.stat().st_mtime <= 60*15:
                 print("Using leaderboard cache %s" % self._cache_filename)
                 with open(self._cache_filename) as f:
@@ -123,32 +123,44 @@ class LeaderBoard:
         for rank,m in enumerate(sorted(ranking, key=lambda m: ranking[m]['points'], reverse=True)):
             print("%2d %-30s %2d stars / %3d pts" % (rank+1, m, ranking[m]['stars'], ranking[m]['points']))
 
-    def dump_events(self, user=None, localtime=False):
+    def dump_events(self, user=None, localtime=False, all=False):
         last_ts = None
         last_day = None
         tz = timezone('CET' if localtime else 'EST')
-        for e in [ e for e in self._events if user is None or str(e['member']).lower().find(user)>=0 ]:
-            this_day = datetime.fromtimestamp(e['ts'], tz=timezone('EST')).strftime("%d")
+        today = datetime.now(timezone('EST')).strftime("%d")
+        for e in self._events :
+            if user is not None and str(e['member']).lower().find(user) < 0:
+                continue
+
+            this_day = datetime.fromtimestamp(e['ts'], timezone('EST')).strftime("%d")
+            if not all and this_day != today:
+                continue
+
             if last_day is not None and this_day != last_day:
                 print("_" * 100)
             last_day = this_day
-            this_ts = datetime.fromtimestamp(e['ts'], tz=tz).strftime("%d %H:%M:%S")
+            this_ts = datetime.fromtimestamp(e['ts'], tz).strftime("%d %H:%M:%S")
             if last_ts is not None and this_ts == last_ts:
                 this_ts = ""
             else:
                 last_ts = this_ts
 
-            print("%-14s %-30s #%2d %4d pts | +%2d pts for being #%2d on star %2d/%d" % (
+            print("%-12s %-30s #%2d on star %2d/%d = +%2d pts | General #%2d with %4d pts" % (
                 this_ts,
                 e['member'],
-                e['global_rank'],
-                e['score'],
-                e['points'],
                 e['rank'],
                 e['day'],
-                e['star']
+                e['star'],
+                e['points'],
+                e['global_rank'],
+                e['score']
                 )
             )
+        
+        today_events = [ e for e in self._events if datetime.fromtimestamp(e['ts'], timezone('EST')).strftime("%d") == today ]
+        next_points_1 = max(0, min([ e['points'] for e in today_events if e['star'] == 1 ])-1)
+        next_points_2 = max(0, min([ e['points'] for e in today_events if e['star'] == 2 ])-1)
+        print("Next stars: 1=%d pts, 2=%d pts" % (next_points_1, next_points_2))
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -156,15 +168,17 @@ parser.add_argument("--id", type=int, default=563747)
 parser.add_argument("--day", "-d")
 parser.add_argument("--events", "-e", action='store_true')
 parser.add_argument("--localtime", "-l", action='store_true')
+parser.add_argument("--all", "-a", action='store_true')
+parser.add_argument("--reload", "-r", action='store_true')
 parser.add_argument("--user", "-u")
 
 args = parser.parse_args()
 
 #lb = LeaderBoard(978694)
-lb = LeaderBoard(args.id)
+lb = LeaderBoard(args.id, reload=args.reload)
 
 if args.events:
-    lb.dump_events(user=args.user, localtime = args.localtime)
+    lb.dump_events(user=args.user, localtime=args.localtime, all=args.all)
 else:
     lb.dump_ranking(args.day)
 

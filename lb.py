@@ -120,8 +120,15 @@ class LeaderBoard:
             else:
                 ranking[e['member']] = { 'points': e['points'], 'rank': e['rank'], 'stars': 1 }
 
-        for rank,m in enumerate(sorted(ranking, key=lambda m: ranking[m]['points'], reverse=True)):
-            print("%2d %-30s %2d stars / %3d pts" % (rank+1, m, ranking[m]['stars'], ranking[m]['points']))
+        rank = 1
+        prev_points = None
+        for m in sorted(ranking, key=lambda m: ranking[m]['points'], reverse=True):
+            if prev_points is not None and ranking[m]['points'] != prev_points:
+                rank += 1
+            print("%2s %-30s %2d stars / %3d pts" % (rank if ranking[m]['points'] != prev_points else "|", m, ranking[m]['stars'], ranking[m]['points']))
+            prev_points = ranking[m]['points']
+
+        print("%s players" % (len(self._members)))
 
     def dump_events(self, user=None, localtime=False, all=False):
         last_ts = None
@@ -158,9 +165,9 @@ class LeaderBoard:
             )
         
         today_events = [ e for e in self._events if datetime.fromtimestamp(e['ts'], timezone('EST')).strftime("%d") == today ]
-        next_points_1 = max(0, min([ e['points'] for e in today_events if e['star'] == 1 ])-1)
-        next_points_2 = max(0, min([ e['points'] for e in today_events if e['star'] == 2 ])-1)
-        print("Next stars: 1=%d pts, 2=%d pts" % (next_points_1, next_points_2))
+        next_points_1 = max(0, min([ e['points'] for e in today_events if e['star'] == 1 and e['points']>0 ])-1)
+        next_points_2 = max(0, min([ e['points'] for e in today_events if e['star'] == 2 and e['points']>0 ])-1)
+        print("%s players, next stars: 1=%d pts, 2=%d pts" % (len(self._members), next_points_1, next_points_2))
 
 import argparse
 parser = argparse.ArgumentParser()

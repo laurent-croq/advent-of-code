@@ -165,8 +165,8 @@ class LeaderBoard:
             )
         
         today_events = [ e for e in self._events if e['day'] == int(today) ]
-        next_points_1 = max(0, min([ e['points'] for e in today_events if e['star'] == 1 and e['points']>0 ])-1)
-        next_points_2 = max(0, min([ e['points'] for e in today_events if e['star'] == 2 and e['points']>0 ])-1)
+        next_points_1 = max(0, len(self._members)-len([ e['points'] for e in today_events if e['star'] == 1 and e['points']>0 ]))
+        next_points_2 = max(0, len(self._members)-len([ e['points'] for e in today_events if e['star'] == 2 and e['points']>0 ]))
         print("%s players, next stars: 1=%d pts, 2=%d pts" % (len(self._members), next_points_1, next_points_2))
 
 import argparse

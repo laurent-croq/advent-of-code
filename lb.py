@@ -125,7 +125,7 @@ class LeaderBoard:
         for m in sorted(ranking, key=lambda m: ranking[m]['points'], reverse=True):
             if prev_points is not None and ranking[m]['points'] != prev_points:
                 rank += 1
-            print("%2s %-30s %3d points, %2d stars : %s" % (rank if ranking[m]['points'] != prev_points else "|", m, ranking[m]['points'], ranking[m]['stars'], "*" * ranking[m]['stars']))
+            print("%2s %-30s %4d points, %2d stars : %s" % (rank if ranking[m]['points'] != prev_points else "|", m, ranking[m]['points'], ranking[m]['stars'], "*" * ranking[m]['stars']))
             prev_points = ranking[m]['points']
 
         print("%s players" % (len(self._members)))

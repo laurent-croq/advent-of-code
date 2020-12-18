@@ -1,34 +1,44 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.8
 
 import aoc
 puzzle_lines = aoc.read_puzzle_input()
 
-operations = []
-for line in puzzle_lines:
-    operations.append(line.replace(" ", ""))
+formulas = []
+formulas.extend([ line.replace(" ", "") for line in puzzle_lines ])
 
-def find_matching(op):
-    x = 1
-    while op[x] != ')':
-        x += 1 if op[x] != '(' else 1+find_matching(op[x:])
-    return(x)
+def matching_parenthesis(formula, pos):
+    while formula[pos] != ')':
+        if formula[pos] == '(':
+            pos = matching_parenthesis(formula, pos+1)
+        pos += 1
+    return(pos)
 
-import re
-def compute_sum(op):
+def compute_part1(formula):
     try:
-        idx_open = op.index("(")
-        idx_close = find_matching(op[idx_open:])
-        return( compute_sum(op[:idx_open] + str(compute_sum(op[idx_open+1:idx_open+idx_close])) + op[idx_open+idx_close+1:]) )
+        op = formula.rindex("+")
+        return(compute_part1(formula[:op]) + int(formula[op+1:]))
     except:
         pass
 
-    m = re.match(r'(.*)([+*])(\d+)', op)
-    if m is None:
-        return(int(op))
-    else:
-        if m.group(2) == "+":
-            return(compute_sum(m.group(1)) + int(m.group(3)))
-        else:
-            return(compute_sum(m.group(1)) * int(m.group(3)))
+    try:
+        op = formula.rindex("*")
+        return(compute_part1(formula[:op]) * int(formula[op+1:]))
+    except:
+        pass
+
+    return(int(formula))
     
-print("answer = %d" % sum(compute_sum(op) for op in operations))
+import math
+def compute_part2(formula):
+    return(math.prod([ 1 ] + [ sum([ int(i) for i in additions.split("+") ]) for additions in formula.split("*") ]))
+    
+def matching_formula(formula, compute_func):
+    try:
+        idx_open = formula.index("(")
+        idx_close = matching_parenthesis(formula, idx_open+1)
+        return( matching_formula(formula[:idx_open] + str(matching_formula(formula[idx_open+1:idx_close], compute_func)) + formula[idx_close+1:], compute_func) )
+    except:
+        return(compute_func(formula))
+
+print("answer1 = %d" % sum(matching_formula(f, compute_part1) for f in formulas))
+print("answer2 = %d" % sum(matching_formula(f, compute_part2) for f in formulas))

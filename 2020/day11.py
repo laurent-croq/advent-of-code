@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 
+import os, sys
+sys.path.insert(1, os.getcwd()+"/..")
 import aoc
-puzzle_lines = aoc.read_puzzle_input()
+puzzle_lines = aoc.load_puzzle_input()
 
 seats = list(map(lambda l: [False]+[ s=='L' for s in l ]+[False], puzzle_lines))
 seats.insert(0, [False]*len(seats[0]))
@@ -43,7 +45,7 @@ while True:
         break
     occupied = new_occupied
 
-print("answser1 = %d" % sum(sum(occupied, [])))
+print("answer1 = %d" % sum(sum(occupied, [])))
 
 occupied = list( [False]*len(seats[0]) for i in range(len(seats)) )
 while True:
@@ -52,4 +54,4 @@ while True:
         break
     occupied = new_occupied
 
-print("answser2 = %d" % sum(sum(occupied, [])))
+print("answer2 = %d" % sum(sum(occupied, [])))

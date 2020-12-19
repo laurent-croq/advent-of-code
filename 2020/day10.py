@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 
+import os, sys
+sys.path.insert(1, os.getcwd()+"/..")
 import aoc
-puzzle_adapters = [ int(line) for line in aoc.read_puzzle_input() ]
+puzzle_adapters = [ int(line) for line in aoc.load_puzzle_input() ]
 
 def find_longest(adapts, jolts=0):
     if jolts == max(adapts)+3:

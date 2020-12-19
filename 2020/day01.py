@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 
+import os, sys
+sys.path.insert(1, os.getcwd()+"/..")
 import aoc
-puzzle_numbers = [ int(n) for n in aoc.read_puzzle_input() ]
+puzzle_numbers = [ int(n) for n in aoc.load_puzzle_input() ]
 
 for i, n in enumerate(puzzle_numbers):
     if 2020-n in puzzle_numbers[i+1:]:

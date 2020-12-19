@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 
+import os, sys
+sys.path.insert(1, os.getcwd()+"/..")
 import aoc
-puzzle_lines = aoc.read_puzzle_input()
+puzzle_lines = aoc.load_puzzle_input()
 
 rules = []
 messages = []

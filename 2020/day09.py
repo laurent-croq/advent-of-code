@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 
+import os, sys
+sys.path.insert(1, os.getcwd()+"/..")
 import aoc
-puzzle_numbers = [ int(n) for n in aoc.read_puzzle_input() ]
+puzzle_numbers = [ int(n) for n in aoc.load_puzzle_input() ]
 
 def is_XMAS_valid(idx):
     for i in range(idx-25,idx):

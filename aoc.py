@@ -4,13 +4,13 @@ def fetch_puzzle_input(year, day, puzzle_input_filename, reload=False):
     if os.path.isfile(puzzle_input_filename) and not reload:
         return
 
-    puzzle_input_url = "https://adventofcode.com/%d/day/%d/input" % (int(year), int(day))
     try:
         session_id = os.environ['AOC_SESSION_ID']
     except KeyError:
         print("AOC_SESSION_ID environment variable is not defined")
         sys.exit(1)
 
+    puzzle_input_url = "https://adventofcode.com/%d/day/%d/input" % (year, day)
     print("Fetching puzzle input %s and saving in %s" % (puzzle_input_url, puzzle_input_filename))
     with requests.get(puzzle_input_url, cookies={"session": session_id}, stream=True) as r:
         if r.status_code == 404:
@@ -21,10 +21,12 @@ def fetch_puzzle_input(year, day, puzzle_input_filename, reload=False):
         with open(puzzle_input_filename, 'wb') as f:
             shutil.copyfileobj(r.raw, f)
 
-def read_puzzle_input(year=datetime.datetime.now().year):
+def read_puzzle_input():
     parser = argparse.ArgumentParser()
     parser.add_argument("--line", "-l")
     parser.add_argument("--sample", "-s")
+    parser.add_argument("--day", "-d", type=int)
+    parser.add_argument("--year", "-y", type=int)
     parser.add_argument("--reload", "-r", action='store_true')
     parser.add_argument("input_file", nargs='?')
     args = parser.parse_args()
@@ -34,13 +36,16 @@ def read_puzzle_input(year=datetime.datetime.now().year):
         yield(args.line)
     else:
         if args.input_file is None:
-            m = re.search(r'^.*\/day(\d{2})', sys.argv[0])
-            if not m:
-                print("Could not identify day from %s" % sys.argv[0])
-                sys.exit(1)
+            if args.year is None or args.day is None:
+                m = re.search(r'^.*\/(\d{4})\/day(\d{2})', os.path.normpath(os.getcwd()+"/"+sys.argv[0]))
+                if m is not None:
+                    year = int(m.group(1))
+                    day = int(m.group(2))
+                else:
+                    year = datetime.datetime.now().year
+                    day = datetime.datetime.now().day
 
-            day = m.group(1)
-            args.input_file = "inputs/day%s" % day
+            args.input_file = "inputs/day%02d" % day
 
             if args.sample:
                 args.input_file += "."+args.sample
@@ -52,5 +57,5 @@ def read_puzzle_input(year=datetime.datetime.now().year):
             for line in f:
                 yield(line.rstrip("\n"))
 
-def load_puzzle_input(year=datetime.datetime.now().year):
-    return([ line for line in read_puzzle_input(year) ])
+def load_puzzle_input():
+    return([ line for line in read_puzzle_input() ])

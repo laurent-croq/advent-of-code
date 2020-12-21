@@ -16,9 +16,9 @@ def get_borders(bitmap):
     borders.append(int("0b"+re.sub("#", "1", re.sub(r'\.', "0", bitmap[-1])), 2))
     borders.append(int("0b"+re.sub("#", "1", re.sub(r'\.', "0", "".join(l[0] for l in bitmap))), 2))
     borders.append(int("0b"+re.sub("#", "1", re.sub(r'\.', "0", bitmap[0][::-1])), 2))
-    borders.append(int("0b"+re.sub("#", "1", re.sub(r'\.', "0", "".join(l[0] for l in bitmap[::-1]))), 2))
-    borders.append(int("0b"+re.sub("#", "1", re.sub(r'\.', "0", bitmap[-1][::-1])), 2))
     borders.append(int("0b"+re.sub("#", "1", re.sub(r'\.', "0", "".join(l[-1] for l in bitmap[::-1]))), 2))
+    borders.append(int("0b"+re.sub("#", "1", re.sub(r'\.', "0", bitmap[-1][::-1])), 2))
+    borders.append(int("0b"+re.sub("#", "1", re.sub(r'\.', "0", "".join(l[0] for l in bitmap[::-1]))), 2))
     return(borders)
 
 tiles = {}
@@ -46,69 +46,43 @@ max_tiles = int(math.sqrt(len(tiles)))
 grid = [ [ None for _ in range(max_tiles) ] for _ in range(max_tiles) ]
 remaining_tiles = list(tiles)
 
-def position_tile(t, link_tile, direction):
+def position_corner(tile):
+    idx = min([ tiles[tile]['borders'].index(b) for b in set(tiles[tile]['borders']).intersection(set(tiles[tiles[tile]['neighbors'][0]]['borders']).union(tiles[tiles[tile]['neighbors'][1]]['borders']))])
+    for _ in range((5-idx)%4):
+        tiles[tile]['bitmap'] = list("".join(l) for l in [ l for l in zip(*tiles[tile]['bitmap'][::-1]) ] )
+    tiles[tile]['borders'] = get_borders(tiles[tile]['bitmap'])
 
+def position_tile(tile, link_tile, direction):
     idx = tiles[tile]['borders'].index(tiles[link_tile]['borders'][direction])
 
-    for _ in range((direction+idx)%4):
-        tiles[t]['bitmap'] = list("".join(l) for l in [ l for l in zip(*tiles[t]['bitmap'][::-1]) ] )
+    for _ in range((6+direction-idx)%4):
+        tiles[tile]['bitmap'] = list("".join(l) for l in [ l for l in zip(*tiles[tile]['bitmap'][::-1]) ] )
     
+    tiles[tile]['borders'] = get_borders(tiles[tile]['bitmap'])
     idx = tiles[tile]['borders'].index(tiles[link_tile]['borders'][direction])
-
     if idx>=4:
-        tiles[t]['bitmap'] = tiles[t]['bitmap'][::-1]
+        if direction == 1:
+            #print("Flipping V (up/down)")
+            tiles[tile]['bitmap'] = tiles[tile]['bitmap'][::-1]
+        else:
+            #print("Flipping H (left/right)")
+            for b in range(len(tiles[tile]['bitmap'])):
+                tiles[tile]['bitmap'][b] = tiles[tile]['bitmap'][b][::-1]
 
-    if idx%4 == direction:
-        for b in range(len(tiles[t]['bitmap'])):
-            tiles[t]['bitmap'][b] = tiles[t]['bitmap'][b][::-1]
-
-
-#idx = tiles[tile]['borders'].index(tiles[grid[0][x-1]]['borders'][1])
-#position_tile(tile, (7-idx)%4) #, flip_v=(idx>=4))
-
-#idx = tiles[tile]['borders'].index(tiles[grid[0][x-1]]['borders'][1])
-#if idx>=4:
-#    position_tile(tile, 0, flip_h=True)
-#    idx = tiles[tile]['borders'].index(tiles[grid[0][x-1]]['borders'][1])
-#if idx%4 == 1:
-#    position_tile(tile, 0, flip_v=True)
-#    idx = tiles[tile]['borders'].index(tiles[grid[0][x-1]]['borders'][1])
-
-#            idx = tiles[tile]['borders'].index(tiles[grid[y-1][x]]['borders'][2])
-#            position_tile(tile, (6-idx)%4) #, flip_h=(idx>=4))
-
-#            idx = tiles[tile]['borders'].index(tiles[grid[y-1][x]]['borders'][2])
-#            position_tile(tile, 0, flip_h=(idx%4 == 2), flip_v=(idx>=4))
-
+    tiles[tile]['borders'] = get_borders(tiles[tile]['bitmap'])
 
 for y in range(max_tiles):
     for x in range(max_tiles):
         if y == 0:
             if x == 0:
-                tile = corners[0]
+                tile = corners[2]
+                position_corner(tile)
             else:
                 tile = [ t for t in remaining_tiles if tiles[grid[0][x-1]]['borders'][1] in tiles[t]['borders'] ][0]
-                
                 position_tile(tile, grid[0][x-1], 1)
-                #idx = tiles[tile]['borders'].index(tiles[grid[0][x-1]]['borders'][1])
-                #position_tile(tile, (7-idx)%4) #, flip_v=(idx>=4))
-
-                #idx = tiles[tile]['borders'].index(tiles[grid[0][x-1]]['borders'][1])
-                #if idx>=4:
-                #    position_tile(tile, 0, flip_h=True)
-                #    idx = tiles[tile]['borders'].index(tiles[grid[0][x-1]]['borders'][1])
-                #if idx%4 == 1:
-                #    position_tile(tile, 0, flip_v=True)
-                #    idx = tiles[tile]['borders'].index(tiles[grid[0][x-1]]['borders'][1])
         else:
             tile = [ t for t in remaining_tiles if tiles[grid[y-1][x]]['borders'][2] in tiles[t]['borders'] ][0]
-
             position_tile(tile, grid[y-1][x], 2)
-#            idx = tiles[tile]['borders'].index(tiles[grid[y-1][x]]['borders'][2])
-#            position_tile(tile, (6-idx)%4) #, flip_h=(idx>=4))
-
-#            idx = tiles[tile]['borders'].index(tiles[grid[y-1][x]]['borders'][2])
-#            position_tile(tile, 0, flip_h=(idx%4 == 2), flip_v=(idx>=4))
 
         grid[y][x] = tile
         remaining_tiles.remove(tile)

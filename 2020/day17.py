@@ -5,23 +5,11 @@ sys.path.insert(1, os.getcwd()+"/..")
 import aoc
 puzzle_lines = aoc.load_puzzle_input()
 
-import copy
-
-initial_grid = []
+grid = []
 for line in puzzle_lines:
-    initial_grid.append( [ i == '#' for i in line ] )
+    grid.append( [ i == '#' for i in line ] )
 
-def dump_grid(grid, levels="", level=0):
-    if type(grid[0][0]) == bool:
-        if levels != "":
-            print(levels)
-        for y, line in enumerate(grid):
-            print("%s (y=%d)" % ("".join([ "#" if p else "." for p in line ]), y))
-    else:
-        levels = "l"+str(level) if level==0 else levels+",l"+str(level) 
-        for i in range(len(grid)):
-            dump_grid(grid[i], levels+"="+str(i), level+1)
-
+import copy
 def extend_grid(grid):
     if type(grid[0]) == bool:
         grid.insert(0, False)
@@ -43,9 +31,6 @@ def neighbors(grid, v, sumnz=0):
             total += neighbors(grid[v[0]+delta], v[1:], sumnz+(delta!=0))
         return(total)
 
-def sum_grid(grid):
-    return(int(grid) if type(grid) == bool else sum([ sum_grid(g) for g in grid ]))
-
 def next_grid(dimensions, grid, v, new_grid):
     if len(v) == dimensions:
         total = neighbors(grid, v)
@@ -63,8 +48,10 @@ def next_grid(dimensions, grid, v, new_grid):
         for i in range(1, len(nextg)-1):
             next_grid(dimensions, grid, v+[i], new_grid)
 
-def answer(initial_grid, dimensions):
-    grid = copy.deepcopy(initial_grid)
+def sum_grid(grid):
+    return(int(grid) if type(grid) == bool else sum([ sum_grid(g) for g in grid ]))
+
+def answer(grid, dimensions):
     for _ in range(dimensions-2):
         grid = [ grid ]
 
@@ -78,5 +65,5 @@ def answer(initial_grid, dimensions):
     
     return(sum_grid(new_grid))
 
-print("answer1 = %d" % answer(initial_grid, 3))
-print("answer2 = %d" % answer(initial_grid, 4))
+print("answer1 = %d" % answer(grid[:], 3))
+print("answer2 = %d" % answer(grid[:], 4))

@@ -31,8 +31,9 @@ def play_game2(deck1, deck2, subgame=False):
 
     previous_rounds = []
     while len(deck1)>0 and len(deck2)>0:
-        previous_rounds.append([deck1[:], deck2[:]])
-        if [ deck1, deck2 ] in previous_rounds[:-1]:
+        this_round = "-".join(str(n) for n in deck1)+":"+"-".join(str(n) for n in deck2)
+        previous_rounds.append(this_round)
+        if this_round in previous_rounds[:-1]:
             winner = 1
         elif len(deck1[1:]) >= deck1[0] and len(deck2[1:]) >= deck2[0]:
             winner = play_game2(deck1[1:1+deck1[0]], deck2[1:1+deck2[0]], subgame=True)

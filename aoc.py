@@ -1,5 +1,7 @@
 import argparse, requests, sys, re, os, shutil, datetime, time, glob, json
 
+assert sys.version_info >= (3, 8)
+
 def fetch_puzzle_input(year, day, puzzle_input_filename, reload=False):
     if os.path.isfile(puzzle_input_filename) and not reload:
         return

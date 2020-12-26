@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 
-import os, sys
-sys.path.insert(1, os.getcwd()+"/..")
 import aoc
 cups = [ int(c) for c in aoc.load_puzzle_input()[0] ]
 

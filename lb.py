@@ -177,12 +177,17 @@ parser.add_argument("--events", "-e", action='store_true')
 parser.add_argument("--localtime", "-l", action='store_true')
 parser.add_argument("--all", "-a", action='store_true')
 parser.add_argument("--reload", "-r", action='store_true')
+parser.add_argument("--year", "-y")
 parser.add_argument("--user", "-u")
 
 args = parser.parse_args()
 
 #lb = LeaderBoard(978694)
-lb = LeaderBoard(args.id, reload=args.reload)
+if args.year is None:
+    m = re.search(r'^.*\/(\d{4})\/', os.path.normpath(os.getcwd()+"/"+sys.argv[0]))
+    args.year = int(m.group(1)) if m is not None else datetime.now().year
+
+lb = LeaderBoard(args.id, year=args.year, reload=args.reload)
 
 if args.events:
     lb.dump_events(user=args.user, localtime=args.localtime, all=args.all)

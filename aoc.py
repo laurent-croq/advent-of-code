@@ -40,14 +40,10 @@ def read_puzzle_input():
         if args.input_file is None:
             if args.year is None or args.day is None:
                 m = re.search(r'^.*\/(\d{4})\/day(\d{2})', os.path.normpath(os.getcwd()+"/"+sys.argv[0]))
-                if m is not None:
-                    year = int(m.group(1))
-                    day = int(m.group(2))
-                else:
-                    year = datetime.datetime.now().year
-                    day = datetime.datetime.now().day
+                year = datetime.datetime.now().year if m is None else int(m.group(1))
+                day = datetime.datetime.now().day if m is None else int(m.group(2))
 
-            args.input_file = "inputs/day%02d" % day
+            args.input_file = os.path.normpath("%s/inputs/day%02d" % (os.path.dirname(os.getcwd()+"/"+sys.argv[0]), day))
 
             if args.sample:
                 args.input_file += "."+args.sample

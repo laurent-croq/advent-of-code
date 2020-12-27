@@ -23,7 +23,7 @@ def fetch_puzzle_input(year, day, puzzle_input_filename, reload=False):
         with open(puzzle_input_filename, 'wb') as f:
             shutil.copyfileobj(r.raw, f)
 
-def read_puzzle_input():
+def run(puzzles):
     parser = argparse.ArgumentParser()
     parser.add_argument("--line", "-l")
     parser.add_argument("--sample", "-s")
@@ -35,7 +35,7 @@ def read_puzzle_input():
 
     if args.line is not None:
         print("Using string '%s' as puzzle input" % args.line)
-        yield(args.line)
+        puzzle_lines = [ args.line ]
     else:
         if args.input_file is None:
             if args.year is None or args.day is None:
@@ -52,8 +52,8 @@ def read_puzzle_input():
 
         print("Reading puzzle input from %s" % args.input_file)
         with open(args.input_file) as f:
-            for line in f:
-                yield(line.rstrip("\n"))
+            puzzle_lines = f.read().splitlines()
 
-def load_puzzle_input():
-    return([ line for line in read_puzzle_input() ])
+    answers = puzzles(puzzle_lines)
+    print("answer1 = %s" % next(answers))
+    print("answer2 = %s" % next(answers))

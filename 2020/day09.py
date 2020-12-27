@@ -1,24 +1,28 @@
 #!/usr/bin/python3
 
 import aoc
-puzzle_numbers = [ int(n) for n in aoc.load_puzzle_input() ]
 
-def is_XMAS_valid(idx):
+def is_XMAS_valid(numbers, idx):
     for i in range(idx-25,idx):
-        if puzzle_numbers[idx]-puzzle_numbers[i] in puzzle_numbers[i:idx]:
+        if numbers[idx]-numbers[i] in numbers[i:idx]:
             return(True)
     return(False)
 
-for idx in range(25, len(puzzle_numbers)):
-    if not is_XMAS_valid(idx):
-        invalid_idx = idx
-        invalid_number = puzzle_numbers[idx]
-        print("answer1 = %d (at #%d)" % (invalid_number, invalid_idx))
-        break
+def puzzles(input_lines):
+    numbers = [ int(n) for n in input_lines ]
+    for idx in range(25, len(numbers)):
+        if not is_XMAS_valid(numbers, idx):
+            invalid_idx = idx
+            yield(numbers[invalid_idx])
+            break
 
-for idx in range(1, invalid_idx):
-    for i in range(idx+1):
-        this_set = [ n for n in puzzle_numbers[i:idx] ]
-        if sum(this_set) == invalid_number:
-            print("answer2 = %d (at #%d, sum of %d numbers)" % (min(this_set) + max(this_set), i, idx-i))
+    for idx in range(1, invalid_idx):
+        for i in range(idx+1):
+            this_set = [ n for n in numbers[i:idx] ]
+            if sum(this_set) == numbers[invalid_idx]:
+                yield(min(this_set) + max(this_set))
+                return
+    
+    yield(None)
 
+aoc.run(puzzles)

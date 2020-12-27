@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 
 import aoc
-puzzle_lines = aoc.load_puzzle_input()
 
-import re
+mandatory_fields = { 'byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid' }
 
 def is_valid_value(value, pattern, min_v=None, max_v=None):
+    import re
     m = re.search("^"+pattern+"$", value)
     if not m:
         return(False)
@@ -13,15 +13,10 @@ def is_valid_value(value, pattern, min_v=None, max_v=None):
     return(True if min_v is None or (int(m.group(1))>=min_v and int(m.group(1))<=max_v) else False)
 
 def is_valid_passport_part1(passport):
-    for field in [ 'byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid' ]:
-        if field not in passport:
-            return(False)
-    return(True)
+    return(set(passport).intersection(mandatory_fields) == mandatory_fields)
 
 def is_valid_passport_part2(passport):
-    for field in [ 'byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid' ]:
-        if field not in passport:
-            return(False)
+    for field in mandatory_fields:
         if field == 'byr':
             if not is_valid_value(passport[field], r'(\d{4})', 1920, 2002):
                 return(False)
@@ -45,19 +40,22 @@ def is_valid_passport_part2(passport):
                 return(False)
     return(True)
 
-part1_valid_passports = []
-this_passport = {}
-for line in puzzle_lines:
-    if line == "":
-        if is_valid_passport_part1(this_passport):
-            part1_valid_passports.append(this_passport)
-        this_passport = {}
-    else:
-        for field, value in [ fv.split(':') for fv in line.split(' ') ]:
-            this_passport[field] = value
+def puzzles(input_lines):
+    valid_passports = []
+    this_passport = {}
+    for line in input_lines:
+        if line == "":
+            if is_valid_passport_part1(this_passport):
+                valid_passports.append(this_passport)
+            this_passport = {}
+        else:
+            for field, value in [ fv.split(':') for fv in line.split(' ') ]:
+                this_passport[field] = value
 
-if is_valid_passport_part1(this_passport):
-    part1_valid_passports.append(this_passport)
+    if is_valid_passport_part1(this_passport):
+        valid_passports.append(this_passport)
+    
+    yield(len(valid_passports))
+    yield(len([ p for p in valid_passports if is_valid_passport_part2(p) ]))
 
-print("answer1 = %d" % len(part1_valid_passports))
-print("answer2 = %d" % len([ p for p in part1_valid_passports if is_valid_passport_part2(p) ]))
+aoc.run(puzzles)

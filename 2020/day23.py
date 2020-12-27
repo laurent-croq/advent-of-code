@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import aoc
-cups = [ int(c) for c in aoc.load_puzzle_input()[0] ]
 
 def do_moves(initial_cups, max_cups=None, total_rounds=100):
     ring = {}
@@ -42,5 +41,9 @@ def do_moves(initial_cups, max_cups=None, total_rounds=100):
     else:
         return(ring[1] * ring[ring[1]])
 
-print("answer1 = %s" % do_moves(cups))
-print("answer2 = %d" % do_moves(cups, max_cups=1000000, total_rounds=10000000))
+def puzzles(input_lines):
+    cups = [ int(c) for c in input_lines[0] ]
+    yield(do_moves(cups))
+    yield(do_moves(cups, max_cups=1000000, total_rounds=10000000))
+
+aoc.run(puzzles)

@@ -1,16 +1,15 @@
 #!/usr/bin/python3
 
 import aoc
-puzzle_numbers = [ int(n) for n in aoc.load_puzzle_input()[0].split(',') ]
 
-def solve(puzzle_numbers, max_turn):
+def solve(numbers, max_turn):
     previous = {}
     last_seen = {}
-    for i,n in enumerate(puzzle_numbers):
+    for i,n in enumerate(numbers):
         last_seen[n] = i+1
 
-    last_one = puzzle_numbers[-1]
-    turn = len(puzzle_numbers)
+    last_one = numbers[-1]
+    turn = len(numbers)
 
     while turn < max_turn:
         next_one = last_seen[last_one]-previous[last_one] if last_one in previous else 0
@@ -23,5 +22,10 @@ def solve(puzzle_numbers, max_turn):
     
     return(last_one)
 
-print("answer1 = %d" % solve(puzzle_numbers, 2020))
-print("answer2 = %d" % solve(puzzle_numbers, 30000000))
+def puzzles(input_lines):
+    numbers = [ int(n) for n in input_lines[0].split(',') ]
+
+    yield(solve(numbers, 2020))
+    yield(solve(numbers, 30000000))
+
+aoc.run(puzzles)

@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
 import aoc
-puzzle_lines = aoc.load_puzzle_input()
 
 import re,copy
+
 def identify_tile(coord, moves):
     while moves != "":
         m = re.match('^(w|e|sw|se|nw|ne)(.*)', moves)
@@ -64,27 +64,30 @@ def next_grid(grid):
 
     return(new_grid)
 
-center = [ 0, 0, 0 ]
-grid = [ [ [ False, False ] ] ]
+def puzzles(input_lines):
+    center = [ 0, 0, 0 ]
+    grid = [ [ [ False, False ] ] ]
 
-for line in puzzle_lines:
-    coord = center[:]
-    identify_tile(coord, line)
-    extend_grid(grid, coord, center)
+    for line in input_lines:
+        coord = center[:]
+        identify_tile(coord, line)
+        extend_grid(grid, coord, center)
 
-    grid[coord[0]][coord[1]][coord[2]] = not(grid[coord[0]][coord[1]][coord[2]])
+        grid[coord[0]][coord[1]][coord[2]] = not(grid[coord[0]][coord[1]][coord[2]])
 
-print("answer1 = %d" % total_black_tiles(grid))
+    yield(total_black_tiles(grid))
 
-for day in range(100):
-    if sum([ sum(grid[0][x][b] for b in range(2)) for x in range(len(grid[0])) ]) > 0:
-        extend_grid(grid, [-1,0])
-    if sum([ sum(grid[y][0][b] for b in range(2)) for y in range(len(grid)) ]) > 0:
-        extend_grid(grid, [0,-1])
-    if sum([ sum(grid[len(grid)-1][x][b] for b in range(2)) for x in range(len(grid[0])) ]) > 0:
-        extend_grid(grid, [len(grid),0])
-    if sum([ sum(grid[y][len(grid[0])-1][b] for b in range(2)) for y in range(len(grid)) ]) > 0:
-        extend_grid(grid, [0,len(grid[0])])
-    grid = next_grid(grid)
+    for _ in range(100):
+        if sum([ sum(grid[0][x][b] for b in range(2)) for x in range(len(grid[0])) ]) > 0:
+            extend_grid(grid, [-1,0])
+        if sum([ sum(grid[y][0][b] for b in range(2)) for y in range(len(grid)) ]) > 0:
+            extend_grid(grid, [0,-1])
+        if sum([ sum(grid[len(grid)-1][x][b] for b in range(2)) for x in range(len(grid[0])) ]) > 0:
+            extend_grid(grid, [len(grid),0])
+        if sum([ sum(grid[y][len(grid[0])-1][b] for b in range(2)) for y in range(len(grid)) ]) > 0:
+            extend_grid(grid, [0,len(grid[0])])
+        grid = next_grid(grid)
 
-print("answer2 = %d" % total_black_tiles(grid))
+    yield(total_black_tiles(grid))
+
+aoc.run(puzzles)

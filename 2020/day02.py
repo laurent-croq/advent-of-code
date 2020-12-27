@@ -1,22 +1,17 @@
 #!/usr/bin/python3
 
 import aoc
-puzzle_lines = aoc.load_puzzle_input()
 
 import re
 
-total_valid1 = 0
-total_valid2 = 0
-#for val1,val2,char,password in [ [ int(d[0]), int(d[1]), d[2], d[3] ] for line in puzzle_lines for d in [ re.sub(r"^(\d+)-(\d+) (\w): (\w*)", r"\1:\2:\3:\4", line).split(":") ] ]:
-for line in puzzle_lines:
-    for val1,val2,char,password in [ [ int(d[0]), int(d[1]), d[2], d[3] ] for d in [ re.sub(r"^(\d+)-(\d+) (\w): (\w*)", r"\1:\2:\3:\4", line).split(":") ] ]:
+def puzzles(input_lines):
+    answer1 = answer2 = 0
+    for val1,val2,char,password in [ [ int(f[0]), int(f[1]), f[2], f[3] ] for f in [ re.sub(r"^(\d+)-(\d+) (\w): (\w*)", r"\1:\2:\3:\4", line).split(":") for line in input_lines ] ]:
         c = password.count(char)
-        if c>=val1 and c<=val2:
-            total_valid1 += 1
+        answer1 += c>=val1 and c<=val2
+        answer2 += (password[val1-1] == char) != (password[val2-1] == char)
 
-        if (password[val1-1] == char) != (password[val2-1] == char):
-            total_valid2 += 1
+    yield(answer1)
+    yield(answer2)
 
-print("answer1 = %d" % total_valid1)
-print("answer2 = %d" % total_valid2)
-
+aoc.run(puzzles)

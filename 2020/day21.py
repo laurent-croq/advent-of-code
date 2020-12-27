@@ -1,15 +1,8 @@
 #!/usr/bin/python3
 
 import aoc
-puzzle_lines = aoc.load_puzzle_input()
 
 import itertools,re
-
-foods = []
-
-for line in puzzle_lines:
-    m = re.match(r'(.*) \(contains (.*)\)', line)
-    foods.append({ "ingredients": m.group(1).split(" "), "allergens": m.group(2).split(", ") })
 
 def find_allergens(foods, ing2all = {}):
     if len(foods) == 0:
@@ -38,7 +31,16 @@ def find_allergens(foods, ing2all = {}):
                 if res is not None:
                     return(res)
 
-ingredients_with_allergens = find_allergens(foods)
+def puzzles(input_lines):
+    foods = []
 
-print("answer1 = %d" % sum(len(set(f['ingredients']).difference(ingredients_with_allergens.values())) for f in foods))
-print("answer2 = %s" % ",".join([ v[1] for v in sorted(ingredients_with_allergens.items(), key=lambda v: v[0]) ] ))
+    for line in input_lines:
+        m = re.match(r'(.*) \(contains (.*)\)', line)
+        foods.append({ "ingredients": m.group(1).split(" "), "allergens": m.group(2).split(", ") })
+
+    ingredients_with_allergens = find_allergens(foods)
+
+    yield(sum(len(set(f['ingredients']).difference(ingredients_with_allergens.values())) for f in foods))
+    yield(",".join([ v[1] for v in sorted(ingredients_with_allergens.items(), key=lambda v: v[0]) ] ))
+
+aoc.run(puzzles)

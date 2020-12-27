@@ -1,13 +1,9 @@
 #!/usr/bin/python3
 
 import aoc
-puzzle_lines = aoc.load_puzzle_input()
-
-grid = [ [] ]
-for line in puzzle_lines:
-    grid[0].append([ i == '#' for i in line ])
 
 import copy
+
 def extend_grid(grid):
     for layer in grid:
         for line in layer:
@@ -34,8 +30,16 @@ def next_grid(grid):
             new_grid[z][y][x] = True if total_neighbors == 3 else False
     return(new_grid)
 
-extend_grid(grid)
-for _ in range(6):
-    grid = next_grid(grid)
+def puzzles(input_lines):
+    grid = [ [] ]
+    for line in input_lines:
+        grid[0].append([ i == '#' for i in line ])
 
-print("answer1 = %d" % sum(grid[z][y][x] for z,y,x in [ [z,y,x] for z in range(len(grid)) for y in range(len(grid[z])) for x in range(len(grid[z][y])) ]))
+    extend_grid(grid)
+    for _ in range(6):
+        grid = next_grid(grid)
+
+    yield(sum(grid[z][y][x] for z,y,x in [ [z,y,x] for z in range(len(grid)) for y in range(len(grid[z])) for x in range(len(grid[z][y])) ]))
+    yield(None)
+
+aoc.run(puzzles)

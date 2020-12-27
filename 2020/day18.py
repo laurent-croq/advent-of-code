@@ -1,10 +1,8 @@
 #!/usr/bin/python3
 
 import aoc
-puzzle_lines = aoc.load_puzzle_input()
 
-formulas = []
-formulas.extend([ line.replace(" ", "") for line in puzzle_lines ])
+import math
 
 def matching_parenthesis(formula, pos):
     while formula[pos] != ')':
@@ -28,7 +26,6 @@ def compute_part1(formula):
 
     return(int(formula))
     
-import math
 def compute_part2(formula):
     return(math.prod([ 1 ] + [ sum([ int(i) for i in additions.split("+") ]) for additions in formula.split("*") ]))
     
@@ -40,5 +37,11 @@ def solve_formula(formula, compute_func):
     except:
         return(compute_func(formula))
 
-print("answer1 = %d" % sum(solve_formula(f, compute_part1) for f in formulas))
-print("answer2 = %d" % sum(solve_formula(f, compute_part2) for f in formulas))
+def puzzles(input_lines):
+    formulas = []
+    formulas.extend([ line.replace(" ", "") for line in input_lines ])
+
+    yield(sum(solve_formula(f, compute_part1) for f in formulas))
+    yield(sum(solve_formula(f, compute_part2) for f in formulas))
+
+aoc.run(puzzles)

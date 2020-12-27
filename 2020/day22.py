@@ -1,16 +1,6 @@
 #!/usr/bin/python3
 
 import aoc
-puzzle_lines = aoc.load_puzzle_input()
-
-deck1 = []
-deck2 = []
-current_deck = deck1
-for line in puzzle_lines:
-    if line == "":
-        current_deck = deck2
-    elif line[-1] != ":":
-        current_deck.append(int(line))
 
 def play_game1(deck1, deck2):
     while len(deck1)>0 and len(deck2)>0:
@@ -50,5 +40,17 @@ def play_game2(deck1, deck2, subgame=False):
     else:
         return(deck1 if len(deck2) == 0 else deck2)
 
-print("answer1 = %d" % sum(v*(i+1) for i,v in enumerate(play_game1(deck1[:], deck2[:])[::-1])))
-print("answer2 = %d" % sum(v*(i+1) for i,v in enumerate(play_game2(deck1[:], deck2[:])[::-1])))
+def puzzles(input_lines):
+    deck1 = []
+    deck2 = []
+    current_deck = deck1
+    for line in input_lines:
+        if line == "":
+            current_deck = deck2
+        elif line[-1] != ":":
+            current_deck.append(int(line))
+
+    yield(sum(v*(i+1) for i,v in enumerate(play_game1(deck1[:], deck2[:])[::-1])))
+    yield(sum(v*(i+1) for i,v in enumerate(play_game2(deck1[:], deck2[:])[::-1])))
+
+aoc.run(puzzles)

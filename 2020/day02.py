@@ -14,4 +14,4 @@ def puzzles(input_lines):
     yield(answer1)
     yield(answer2)
 
-aoc.run(puzzles)
+aoc.run(puzzles, samples = { 1: [ 2, 1 ] })

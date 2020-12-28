@@ -18,4 +18,4 @@ def puzzles(input_lines):
                 if answer1 is not None:
                     yield(answer2)
 
-aoc.run(puzzles)
+aoc.run(puzzles, samples = { 1: [ 514579, 241861950 ] })

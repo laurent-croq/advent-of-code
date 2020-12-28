@@ -19,4 +19,4 @@ def puzzles(input_lines):
     yield(count_trees(input_lines, [3, 1]))
     yield(math.prod([ count_trees(input_lines, slope) for slope in [ [1,1], [3,1], [5,1], [7,1], [1,2] ] ]))
 
-aoc.run(puzzles)
+aoc.run(puzzles, samples = { 1: [ 7, 336 ] })

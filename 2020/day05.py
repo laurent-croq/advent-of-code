@@ -19,4 +19,4 @@ def puzzles(input_lines):
     
     yield(None)
 
-aoc.run(puzzles)
+aoc.run(puzzles, samples = { 1: [357,None] })

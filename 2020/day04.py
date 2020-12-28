@@ -58,4 +58,4 @@ def puzzles(input_lines):
     yield(len(valid_passports))
     yield(len([ p for p in valid_passports if is_valid_passport_part2(p) ]))
 
-aoc.run(puzzles)
+aoc.run(puzzles, samples = { 1: [ 8, 4 ], 2: [ 2, 2 ]})

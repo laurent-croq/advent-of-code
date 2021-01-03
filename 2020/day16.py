@@ -10,7 +10,7 @@ def is_valid(v, ranges):
             return(True)
     return(False)
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     valid_ranges = []
     my_ticket = None
     nearby_tickets = []

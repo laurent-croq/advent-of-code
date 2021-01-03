@@ -13,7 +13,7 @@ def find_next(buses, departures, ts, period, next_bus):
             break
     return(next_ts if next_bus == buses[-1] else find_next(buses, departures, next_ts, period*next_bus, buses[buses.index(next_bus)+1]))
     
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     earliest = int(input_lines[0])
     buses = []
     departures = {}

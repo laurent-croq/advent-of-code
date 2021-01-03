@@ -135,7 +135,7 @@ def puzzles_part2(input_lines):
 
     yield(sum(grid[w][z][y][x] for w,z,y,x in [ [w,z,y,x] for w in range(len(grid)) for z in range(len(grid[w])) for y in range(len(grid[w][z])) for x in range(len(grid[w][z][y])) ]))
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     grid = []
     for line in input_lines:
         grid.append( [ i == '#' for i in line ] )

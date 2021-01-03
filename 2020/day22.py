@@ -40,7 +40,7 @@ def play_game2(deck1, deck2, subgame=False):
     else:
         return(deck1 if len(deck2) == 0 else deck2)
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     deck1 = []
     deck2 = []
     current_deck = deck1

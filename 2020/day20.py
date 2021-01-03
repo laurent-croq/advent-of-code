@@ -56,7 +56,7 @@ def find_monster(bitmap):
 
     return(None if found==0 else sum([ line.count('#') for line in bitmap ])-found*len(offsets))
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     tiles = {}
     bitmap = []
     tile_num = None

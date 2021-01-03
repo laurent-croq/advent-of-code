@@ -40,7 +40,7 @@ def is_valid_passport_part2(passport):
                 return(False)
     return(True)
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     valid_passports = []
     this_passport = {}
     for line in input_lines:

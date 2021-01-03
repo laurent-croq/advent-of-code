@@ -2,7 +2,7 @@
 
 import aoc
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     total_part1 = 0
     total_part2 = 0
 

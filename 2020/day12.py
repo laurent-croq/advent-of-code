@@ -4,7 +4,7 @@ import aoc
 
 import numpy as np
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     direction_coeff = { "N": [0,1], "S": [0,-1], "E": [1,0], "W": [-1,0] }
     forward_coeff = [ [0,1], [1,0], [0,-1], [-1,0] ]
 

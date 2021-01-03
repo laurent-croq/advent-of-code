@@ -8,7 +8,7 @@ def is_XMAS_valid(numbers, idx):
             return(True)
     return(False)
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     numbers = [ int(n) for n in input_lines ]
     for idx in range(25, len(numbers)):
         if not is_XMAS_valid(numbers, idx):

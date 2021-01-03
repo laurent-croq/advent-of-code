@@ -2,7 +2,7 @@
 
 import aoc
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     card_public_key = int(input_lines[0])
     door_public_key = int(input_lines[1])
 

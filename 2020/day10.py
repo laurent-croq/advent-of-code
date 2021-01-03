@@ -10,7 +10,7 @@ def find_longest(adapters, jolts=0):
     diff = 1 if jolts+1 in adapters else 3
     return([diff] + find_longest(adapters, jolts+diff))
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     adapters = [ int(line) for line in input_lines ]
     longest = find_longest(adapters)
 

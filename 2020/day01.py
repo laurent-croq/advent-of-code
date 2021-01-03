@@ -2,7 +2,7 @@
 
 import aoc
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     input_numbers = [ int(n) for n in input_lines ]
     answer1 = answer2 = None
     for i, n in enumerate(input_numbers):

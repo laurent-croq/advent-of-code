@@ -37,7 +37,7 @@ def solve_formula(formula, compute_func):
     except:
         return(compute_func(formula))
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     formulas = []
     formulas.extend([ line.replace(" ", "") for line in input_lines ])
 

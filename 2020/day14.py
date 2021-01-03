@@ -7,7 +7,7 @@ import re
 def adresses(addr, bits):
     return([ addr, addr|bits[0] ] if len(bits)==1 else sum([ [a, a|bits[0]] for a in adresses(addr, bits[1:]) ], []))
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     memory = {}
 
     for line in input_lines:

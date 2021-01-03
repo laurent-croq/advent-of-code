@@ -30,8 +30,16 @@ def run(puzzles, samples=None):
     parser.add_argument("--day", "-d", type=int)
     parser.add_argument("--year", "-y", type=int)
     parser.add_argument("--reload", "-r", action='store_true')
+    parser.add_argument("--continue", "-c", action='store_true', dest="continue_on_error")
+    parser.add_argument("--extra", "-e", action='append')
+    parser.add_argument("--skip1", action='store_true')
+    parser.add_argument("--skip2", action='store_true')
     parser.add_argument("input_file", nargs='?')
     args = parser.parse_args()
+
+    extra_args = dict(e.split("=") for e in (e for e in args.extra)) if args.extra is not None else {}
+    extra_args['skip1'] = args.skip1
+    extra_args['skip2'] = args.skip2
 
     if args.line is not None:
         print("Using string '%s' as puzzle input" % args.line)
@@ -61,25 +69,27 @@ def run(puzzles, samples=None):
                         with open(args.input_file + "."+str(sample)) as f:
                             puzzle_lines = f.read().splitlines()
                         
-                        answers = puzzles(puzzle_lines)
+                        answers = puzzles(puzzle_lines, **extra_args)
                         answer1 = next(answers)
                         if answer1 == samples[sample][0]:
                             print("- answer1 = %s [OK]" % answer1)
                         else:
                             print("- answer1 = %s [NOK] (expected %s)" % (answer1, samples[sample][0]))
-                            sys.exit(1)
+                            if not args.continue_on_error:
+                                sys.exit(1)
 
                         answer2 = next(answers)
                         if answer2 == samples[sample][1]:
                             print("- answer2 = %s [OK]" % answer2)
                         else:
                             print("- answer2 = %s [NOK] (expected %s)" % (answer2, samples[sample][1]))
-                            sys.exit(1)
+                            if not args.continue_on_error:
+                                sys.exit(1)
 
         print("Reading puzzle input from %s" % args.input_file)
         with open(args.input_file) as f:
             puzzle_lines = f.read().splitlines()
 
-    answers = puzzles(puzzle_lines)
+    answers = puzzles(puzzle_lines, **extra_args)
     print("answer1 = %s" % next(answers))
     print("answer2 = %s" % next(answers))

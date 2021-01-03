@@ -15,7 +15,7 @@ def count_trees(input_lines, slope):
 
     return(total_trees)
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     yield(count_trees(input_lines, [3, 1]))
     yield(math.prod([ count_trees(input_lines, slope) for slope in [ [1,1], [3,1], [5,1], [7,1], [1,2] ] ]))
 

@@ -23,7 +23,7 @@ def run(prog, running_part1=False):
             acc += prog[idx][1]
             idx += 1
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     prog = []
     for line in input_lines:
         m = re.search(r'^(nop|acc|jmp) (.\d+)$', line)

@@ -31,7 +31,7 @@ def apply_rule(seats, occupied, new_seat_state):
 
     return(new_occupied)
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     seats = list(map(lambda l: [False]+[ s=='L' for s in l ]+[False], input_lines))
     seats.insert(0, [False]*len(seats[0]))
     seats.append(seats[0])

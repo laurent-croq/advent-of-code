@@ -25,7 +25,7 @@ def check_msg(rules, msg, remain):
 
     return(msg)
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     rules = []
     messages = []
 

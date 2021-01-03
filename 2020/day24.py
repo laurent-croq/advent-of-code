@@ -64,7 +64,7 @@ def next_grid(grid):
 
     return(new_grid)
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     center = [ 0, 0, 0 ]
     grid = [ [ [ False, False ] ] ]
 

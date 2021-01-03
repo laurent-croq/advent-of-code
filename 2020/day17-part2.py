@@ -35,7 +35,7 @@ def next_grid(grid):
             new_grid[w][z][y][x] = True if total_neighbors == 3 else False
     return(new_grid)
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     grid = [ [ [] ] ]
     for line in input_lines:
         grid[0][0].append( [ i == '#' for i in line ] )

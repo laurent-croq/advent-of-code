@@ -31,7 +31,7 @@ def find_allergens(foods, ing2all = {}):
                 if res is not None:
                     return(res)
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     foods = []
 
     for line in input_lines:

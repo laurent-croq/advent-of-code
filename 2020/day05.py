@@ -4,7 +4,7 @@ import aoc
 
 import re
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     seats = {}
 
     for seat in input_lines:

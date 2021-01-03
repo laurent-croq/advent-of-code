@@ -41,9 +41,9 @@ def do_moves(initial_cups, max_cups=None, total_rounds=100):
     else:
         return(ring[1] * ring[ring[1]])
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     cups = [ int(c) for c in input_lines[0] ]
     yield(do_moves(cups))
-    yield(do_moves(cups, max_cups=1000000, total_rounds=10000000))
+    yield(do_moves(cups, max_cups=1_000_000, total_rounds=10_000_000))
 
 aoc.run(puzzles)

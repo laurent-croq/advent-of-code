@@ -15,7 +15,7 @@ def can_contain_shiny_gold(content, bag):
 def total_bags(content, bag):
     return(1 + sum(content[bag][inner] * total_bags(content, inner) for inner in content[bag]))
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     content = {}
     for line in input_lines:
         m = re.search(r'^(.*) bags contain (.*)\.$', line)

@@ -22,7 +22,7 @@ def solve(numbers, max_turn):
     
     return(last_one)
 
-def puzzles(input_lines):
+def puzzles(input_lines, **extra_args):
     numbers = [ int(n) for n in input_lines[0].split(',') ]
 
     yield(solve(numbers, 2020))

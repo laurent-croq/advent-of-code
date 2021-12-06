@@ -12,7 +12,7 @@ def solve_puzzle(input_lines, **extra_args):
     #for n in [ int(n) for n in input_lines ]:
     #for line in input_lines:
     
-    yield(answer1)
-    yield(answer2)
+    yield answer1
+    yield answer2
 
-aoc.run(solve_puzzle)
+aoc.run(solve_puzzle, samples = {} )

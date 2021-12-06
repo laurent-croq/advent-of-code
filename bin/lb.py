@@ -164,7 +164,7 @@ class LeaderBoard:
             else:
                 last_ts = this_ts
 
-            print("%-19s %-30s #%2d on star %2d/%d = +%2d pts | General #%2d with %4d pts" % (
+            print("%-19s %-30s #%2d on star %2d#%d = +%2d pts | General #%2d with %4d pts" % (
                 this_ts,
                 e['member'],
                 e['rank'],

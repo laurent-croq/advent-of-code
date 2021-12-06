@@ -48,7 +48,7 @@ def check_samples(puzzles, samples, args):
         if answer1 == sample_answers[0]:
             print("- answer1 = %s [OK]" % answer1)
         else:
-            print("- answer1 = %s [NOK] (expected %s)" % (answer1, sample_answers[0]))
+            print("- answer1 = %s [FAIL] (expected %s)" % (answer1, sample_answers[0]))
             if not args.continue_on_error:
                 sys.exit(1)
 
@@ -56,7 +56,7 @@ def check_samples(puzzles, samples, args):
         if answer2 == sample_answers[1]:
             print("- answer2 = %s [OK]" % answer2)
         else:
-            print("- answer2 = %s [NOK] (expected %s)" % (answer2, sample_answers[1]))
+            print("- answer2 = %s [FAIL] (expected %s)" % (answer2, sample_answers[1]))
             if not args.continue_on_error:
                 sys.exit(1)
         print("")

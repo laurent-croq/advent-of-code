@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.8
 
-import os,sys
+import os,sys,math
 sys.path.append(os.path.normpath(sys.argv[0]+"/../.."))
 
 import aoc
@@ -9,7 +9,6 @@ def bassin_size(hm, hmtag, y0, x0, way=None):
     if hm[y0][x0] == 9 or hmtag[y0][x0]:
         return(0)
 
-    print("Exploring at %d,%d" % (y0, x0))
     total = 0
 
     for x in range(x0, len(hm[y0])-1):
@@ -52,13 +51,9 @@ def solve_puzzle(input_lines, **extra_args):
         for x in range(1, len(hm[y])-1):
             if hm[y][x] < min(hm[y-1][x], hm[y+1][x], hm[y][x-1], hm[y][x+1]):
                 answer1 += hm[y][x]+1
-                #print("Found at %d,%d" % (y, x))
-                #print(bassin_size(hm, hmtag, y, x))
                 bassins.append(bassin_size(hm, hmtag, y, x))
 
-    final = sorted(bassins)[-3:]
-
     yield answer1
-    yield final[0]*final[1]*final[2]
+    yield math.prod(sorted(bassins)[-3:])
 
 aoc.run(solve_puzzle, samples = { 1: [15, 1134]} )

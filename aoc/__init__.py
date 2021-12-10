@@ -34,7 +34,7 @@ def initialize_extra_args(args, sample=None, skip1=None, skip2=None):
 
 # Check expected answers for a set of samples
 
-def check_samples(puzzles, samples, args):
+def check_samples(solve_puzzle, samples, args):
     for sample_id, sample_answers in samples.items():
         print("Checking sample %s:" % sample_id)
         with open(args.input_file + "."+str(sample_id)) as f:
@@ -43,7 +43,7 @@ def check_samples(puzzles, samples, args):
         # Determine extra arguments
         extra_args = initialize_extra_args(args, True, sample_answers[0] is None, sample_answers[1] is None)
 
-        answers = puzzles(puzzle_lines, **extra_args)
+        answers = solve_puzzle(puzzle_lines, **extra_args)
         answer1 = next(answers)
         if answer1 == sample_answers[0]:
             print("- answer1 = %s [OK]" % answer1)
@@ -61,7 +61,7 @@ def check_samples(puzzles, samples, args):
                 sys.exit(1)
         print("")
 
-def run(puzzles, samples=None):
+def run(solve_puzzle, samples=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--line", "-l")
     parser.add_argument("--sample", "-s")
@@ -103,7 +103,7 @@ def run(puzzles, samples=None):
 
                 # First check provided sample solutions if any
                 if samples is not None:
-                    check_samples(puzzles, samples, args)
+                    check_samples(solve_puzzle, samples, args)
 
         # Finally read input file
         print("Reading puzzle input from %s" % args.input_file)
@@ -114,7 +114,7 @@ def run(puzzles, samples=None):
     extra_args = initialize_extra_args(args)
 
     # Run puzzle with input
-    answers = puzzles(puzzle_lines, **extra_args)
+    answers = solve_puzzle(puzzle_lines, **extra_args)
 
     print("answer1 = %s" % next(answers))
     print("answer2 = %s" % next(answers))

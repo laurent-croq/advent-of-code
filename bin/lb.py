@@ -59,6 +59,13 @@ class LeaderBoard:
                 2: { "points": len(self._members), "rank": 1 }
             }
 
+        # day #1/2020 is an exception: no reward
+        if year == 2020:
+            star_rewards[1] = {
+                1: { "points": 0, "rank": 1 },
+                2: { "points": 0, "rank": 1 }
+            }
+
         # Complete each event
         for e in self._events:
             e['points'] = star_rewards[e['day']][e['star']]['points']

@@ -1,5 +1,8 @@
 #!/usr/bin/python3
 
+import os,sys
+sys.path.append(os.path.normpath(sys.argv[0]+"/../.."))
+
 import aoc
 
 def run(prog, regs, max_print=80):

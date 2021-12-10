@@ -1,5 +1,8 @@
 #!/usr/bin/python3
 
+import os,sys
+sys.path.append(os.path.normpath(sys.argv[0]+"/../.."))
+
 import aoc
 
 def winner_part1_with_dict(total_elves):

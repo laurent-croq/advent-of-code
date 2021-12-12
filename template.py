@@ -9,10 +9,12 @@ def solve_puzzle(input_lines, **extra_args):
     answer1 = None
     answer2 = None
 
+    #grid = [ line.split(";") for line in input_lines ]:
+    #for v1,... in [ line.split(";") for line in input_lines ]:
     #for n in [ int(n) for n in input_lines ]:
     #for line in input_lines:
     
     yield answer1
     yield answer2
 
-aoc.run(solve_puzzle, samples = {} )
+aoc.run(solve_puzzle, samples = { })

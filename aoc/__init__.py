@@ -114,7 +114,14 @@ def run(solve_puzzle, samples=None):
     extra_args = initialize_extra_args(args)
 
     # Run puzzle with input
+    start_ts = int(round(time.time() * 1000))
     answers = solve_puzzle(puzzle_lines, **extra_args)
 
-    print("answer1 = %s" % next(answers))
-    print("answer2 = %s" % next(answers))
+    answer1 = next(answers)
+    answer1_ts = int(round(time.time() * 1000))
+
+    answer2 = next(answers)
+    answer2_ts = int(round(time.time() * 1000))
+
+    print("answer1 = %s (%d ms)" % (answer1, answer1_ts-start_ts))
+    print("answer2 = %s (%d ms)" % (answer1, answer2_ts-answer1_ts))

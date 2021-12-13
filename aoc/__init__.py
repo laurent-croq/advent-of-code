@@ -124,4 +124,4 @@ def run(solve_puzzle, samples=None):
     answer2_ts = int(round(time.time() * 1000))
 
     print("answer1 = %s (%d ms)" % (answer1, answer1_ts-start_ts))
-    print("answer2 = %s (%d ms)" % (answer1, answer2_ts-answer1_ts))
+    print("answer2 = %s (%d ms)" % (answer2, answer2_ts-answer1_ts))

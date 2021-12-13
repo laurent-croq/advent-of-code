@@ -20,29 +20,31 @@ def solve_puzzle(input_lines, **extra_args):
         else:
             folds.append((line[11], int(line[13:])))
 
-    paper = [ [False] * (max(list(map(list, zip(*points)))[0])+1) for _ in range(max(list(map(list, zip(*points)))[1])+1)]
+    paper = [ [False] * (max(list(map(list, zip(*points)))[0]) + 1) for _ in range(max(list(map(list, zip(*points)))[1]) + 1)]
     for x,y in points:
         paper[y][x] = True
 
     for way,pos in folds:
         if way == "x":
             for y in range(len(paper)):
-                for x in range(pos):
-                    paper[y][x] |= paper[y][len(paper[y])-x-1]
-                paper[y] = paper[y][:pos]
+                #for x in range(pos):
+                #    paper[y][x] |= paper[y][len(paper[y])-x-1]
+                #paper[y] = paper[y][:pos]
+                paper[y] = tuple(map(lambda v: v[0]|v[1], zip(paper[y][:pos], paper[y][-1:-pos-1:-1])))
         else:
-            for x,y in [ (x,y) for y in range(pos) for x in range(len(paper[y])) ]:
-                paper[y][x] |= paper[len(paper)-y-1][x]
-            paper = paper[0:pos]
-        
-        if answer1 is None:
-            answer1 = sum(sum(paper, [])) # sum([ sum(paper[y]) for y in range(len(paper)) ])
+            #for x,y in [ (x,y) for y in range(pos) for x in range(len(paper[y])) ]:
+            #    paper[y][x] |= paper[len(paper)-y-1][x]
+            for y in range(len(paper)):
+                paper[y] = tuple(map(lambda v: v[0]|v[1], zip(paper[y], paper[len(paper)-y-1])))
+            paper = paper[:pos]
 
-    yield answer1
+        if answer1 is None:
+            answer1 = sum(sum(paper, ())) # sum([ sum(paper[y]) for y in range(len(paper)) ])
 
     for y in range(len(paper)):
-        print("".join([ "X" if paper[y][x] else " " for x in range(len(paper[y]))]))
+        print("".join([ "X" if v else " " for v in paper[y]]))
     
+    yield answer1
     yield answer2
 
 aoc.run(solve_puzzle, samples = { 1: [17,None] })

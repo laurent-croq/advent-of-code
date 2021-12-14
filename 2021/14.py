@@ -5,33 +5,32 @@ sys.path.append(os.path.normpath(sys.argv[0]+"/../.."))
 
 import aoc
 
+def diff_most_least(pair_counts, last_atom):
+    atoms = { last_atom: 1 }
+    for a,count in [ (pair[0],pair_counts[pair]) for pair in pair_counts]:
+        atoms[a] = atoms.get(a,0) + count
+
+    return max(atoms.values()) - min(atoms.values())
+
 def solve_puzzle(input_lines, **extra_args):
 
     initial_polymer = input_lines[0]
-
-    occurrences = {}
-    rules = {}
-    for seq,atom in [ line.split(" -> ") for line in input_lines[2:]]:
-        rules[seq] = atom
-        occurrences[atom] = initial_polymer.count(atom)
+    new_atom = dict([ line.split(" -> ") for line in input_lines[2:]])
     
-    current = polymer = { "atom": initial_polymer[0], "next": None }
-    for atom in initial_polymer[1:]:
-        current['next'] = { "atom": atom, 'next': None }
-        current = current['next']
+    pair_counts = dict(zip(new_atom, [0]*len(new_atom)))
+    for pair in [ initial_polymer[i:i+2] for i in range(len(initial_polymer)-1) ]:
+        pair_counts[pair] += 1
 
     for step in range(40):
-        current = polymer
-        while current['next'] is not None:
-            next_seq = current['next']
-            current['next'] = { 'atom': rules[current['atom'] + current['next']['atom']], 'next': next_seq }
-            occurrences[current['next']['atom']] += 1
-            current = next_seq
-        #print(occurrences)
+        if step == 10:
+            yield diff_most_least(pair_counts, initial_polymer[-1])
+            
+        new_pair_counts = dict(zip(new_atom, [0]*len(new_atom)))
+        for pair in pair_counts:
+            new_pair_counts[pair[0]+new_atom[pair]] += pair_counts[pair]
+            new_pair_counts[new_atom[pair]+pair[1]] += pair_counts[pair]
+        pair_counts = new_pair_counts
 
-        if step == 9:
-            yield max(occurrences.values()) - min(occurrences.values())
-
-    yield max(occurrences.values()) - min(occurrences.values())
+    yield diff_most_least(pair_counts, initial_polymer[-1])
 
 aoc.run(solve_puzzle, samples = { 1: [1588,2188189693529] })

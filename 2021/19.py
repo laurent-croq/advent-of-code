@@ -19,7 +19,7 @@ def apply_move(coord, rotate_x, invert_x, permute_axes, dx=0, dy=0, dz=0):
 
 def resolve_scanner(scanners):
     for tested_scanner in [ s for s in scanners if 'moves' not in s ]:
-        for relative_scanner in [ s for s in scanners if 'moves' in s ]:
+        for relative_scanner in [ s for s in scanners if 'moves' in s and s not in tested_scanner['unrelated_scanners'] ]:
             relative_vectors = relative_scanner['vectors']
             tested_vectors = deepcopy(tested_scanner['vectors'])
 
@@ -37,17 +37,19 @@ def resolve_scanner(scanners):
                         tested_vectors = dict( [tuple((k[1],k[2],k[0])), v] for k,v in tested_vectors.items() )
                     tested_vectors = dict( [tuple((-k[0],k[1],-k[2])), v] for k,v in tested_vectors.items() )
                 tested_vectors = dict( [tuple((k[0],-k[2],k[1])), v] for k,v in tested_vectors.items() )
+            
+            tested_scanner['unrelated_scanners'].append(relative_scanner)
 
 def solve_puzzle(input_lines, **extra_args):
     scanners = []
 
-    new_scanner = { "beacons": [], "vectors": {} }
+    new_scanner = { "beacons": [], "vectors": {}, "unrelated_scanners": [] }
     for line in input_lines:
         if line[:3] == "---":
             continue
         elif line == "":
             scanners.append(new_scanner)
-            new_scanner = { "beacons": [], "vectors": {} }
+            new_scanner = { "beacons": [], "vectors": {}, "unrelated_scanners": [] }
         else:
             new_scanner['beacons'].append( tuple(int(s) for s in line.split(',') ))
     scanners.append(new_scanner)

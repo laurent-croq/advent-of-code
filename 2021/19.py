@@ -45,12 +45,10 @@ def solve_puzzle(input_lines, **extra_args):
 
     new_scanner = { "beacons": [], "vectors": {}, "unrelated_scanners": [] }
     for line in input_lines:
-        if line[:3] == "---":
-            continue
-        elif line == "":
+        if line == "":
             scanners.append(new_scanner)
             new_scanner = { "beacons": [], "vectors": {}, "unrelated_scanners": [] }
-        else:
+        elif line[:3] != "---":
             new_scanner['beacons'].append( tuple(int(s) for s in line.split(',') ))
     scanners.append(new_scanner)
 

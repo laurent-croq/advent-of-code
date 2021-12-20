@@ -163,7 +163,7 @@ class LeaderBoard:
                 continue
 
             if last_day is not None and this_day != last_day:
-                print("_" * 100)
+                print("_" * 105)
             last_day = this_day
             this_ts = datetime.fromtimestamp(e['ts'], tz).strftime("%Y/%m/%d %H:%M:%S")
             if last_ts is not None and this_ts == last_ts:

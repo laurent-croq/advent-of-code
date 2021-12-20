@@ -17,12 +17,8 @@ def expand_image(image, padding):
     image.append(padding*len(image[0]))
 
 def solve_puzzle(input_lines, **extra_args):
-
-    algo = "".join("1" if c == "#" else "0" for c in input_lines[0])
-
-    image = []
-    for line in input_lines[2:]:
-        image.append("".join("1" if c=="#" else "0" for c in line))
+    algo = "".join("1" if c=="#" else "0" for c in input_lines[0])
+    image = list("".join("1" if c=="#" else "0" for c in line) for line in input_lines[2:])
 
     padding = "0"
     for _ in range(2):
